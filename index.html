@@ -2,7 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#6657f5" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="LifeFlow" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon.svg" />
   <title>LifeFlow — Personal Life Dashboard</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -73,6 +79,13 @@
     </main>
   </section>
 
+  <nav id="mobileNav" class="mobile-nav">
+    <button data-section="dashboard">🏠<span>Home</span></button>
+    <button data-section="tasks">✅<span>Tasks</span></button>
+    <button data-section="finance">💰<span>Money</span></button>
+    <button data-section="wellness">❤️<span>Health</span></button>
+    <button data-section="settings">⚙️<span>More</span></button>
+  </nav>
   <script src="app.js"></script>
 </body>
 </html>

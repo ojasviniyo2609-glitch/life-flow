@@ -67,7 +67,7 @@ $$(".tab").forEach(b=>b.addEventListener("click",()=>showAuth(b.dataset.auth)));
 $("#logoutBtn").addEventListener("click",()=>{localStorage.removeItem(KEY_SESSION);currentUser=null;showAuth()});
 
 function render(section){
-  $$(".nav-item").forEach(x=>x.classList.toggle("active",x.dataset.section===section));
+  $$(".nav-item").forEach(x=>x.classList.toggle("active",x.dataset.section===section)); $$("#mobileNav button").forEach(x=>x.classList.toggle("active",x.dataset.section===section));
   const titles={dashboard:"Dashboard",tasks:"My Tasks",reminders:"Reminders",progress:"Progress tracking",finance:"Income / Expenses / Savings",water:"Water tracking",wellness:"Sleep / Meals / Exercise",notes:"Personal Notes",schedule:"Daily schedule",notifications:"Notifications",settings:"Settings"};
   $("#pageTitle").textContent=section==="dashboard"?greeting():titles[section];
   $("#notifDot").style.display=state.notifications.some(n=>!n.read)?"block":"none";
@@ -75,7 +75,7 @@ function render(section){
   $("#content").innerHTML=views[section]();
   bindView(section);
 }
-$("#nav").addEventListener("click",e=>{const b=e.target.closest("[data-section]");if(b)render(b.dataset.section)});
+$("#nav").addEventListener("click",e=>{const b=e.target.closest("[data-section]");if(b)render(b.dataset.section)}); $("#mobileNav").addEventListener("click",e=>{const b=e.target.closest("[data-section]");if(b)render(b.dataset.section)});
 $(".icon-btn").addEventListener("click",()=>render("notifications"));
 
 function viewDashboard(){
@@ -136,7 +136,7 @@ function viewWellness(){return `<div class="section-title"><h1>Wellness</h1></di
 function viewNotes(){return `<div class="section-title"><h1>Personal Notes</h1><button class="primary" id="addNote">+ New note</button></div><div class="grid grid-3">${state.notes.map(n=>`<div class="card"><div class="card-head"><h3>${esc(n.title)}</h3><button class="danger" data-del-note="${n.id}">Delete</button></div><p style="white-space:pre-wrap">${esc(n.body)}</p><small class="muted">${dateTime(n.date)}</small></div>`).join("")||empty("No notes yet.")}</div>`}
 function viewSchedule(){return `<div class="section-title"><h1>Daily schedule</h1><button class="primary" id="addSchedule">+ Add event</button></div><div class="card"><div class="list">${state.schedule.sort((a,b)=>a.time.localeCompare(b.time)).map(s=>`<div class="list-row"><div><strong>${esc(s.time)} — ${esc(s.title)}</strong><div class="stat-label">${esc(s.detail||"")}</div></div><button class="danger" data-del-schedule="${s.id}">Delete</button></div>`).join("")||empty("Your day is open. Add a schedule item.")}</div></div>`}
 function viewNotifications(){return `<div class="section-title"><h1>Notifications</h1><button class="secondary" id="readAll">Mark all read</button></div><div class="card"><div class="list">${state.notifications.map(n=>`<div class="list-row"><div><strong>${esc(n.text)}</strong><div class="stat-label">${dateTime(n.time)}</div></div><span class="pill">${n.read?"Read":"New"}</span></div>`).join("")||empty("No notifications.")}</div></div>`}
-function viewSettings(){return `<div class="section-title"><h1>Settings</h1></div><div class="grid grid-2"><div class="card"><h3>Profile</h3><div class="form-grid"><div class="wide"><label>Name</label><input id="setName" value="${esc(currentUser.name)}"></div><div class="wide"><label>Email</label><input value="${esc(currentUser.email)}" disabled></div></div><button class="primary" id="saveProfile">Save profile</button></div><div class="card"><h3>Data & prototype</h3><p class="muted">Each account has its own data in browser local storage. This prototype can later be connected to Firebase, Supabase, or another backend for real multi-device accounts and actual push notifications.</p><button class="secondary" id="seedDemo">Restore demo data</button></div></div>`}
+function viewSettings(){return `<div class="section-title"><h1>Settings</h1></div><div class="grid grid-2"><div class="card"><h3>Profile</h3><div class="form-grid"><div class="wide"><label>Name</label><input id="setName" value="${esc(currentUser.name)}"></div><div class="wide"><label>Email</label><input value="${esc(currentUser.email)}" disabled></div></div><button class="primary" id="saveProfile">Save profile</button></div><div class="card"><h3>Alerts</h3><p class="muted">Status: <strong>${notifStatus()}</strong>. Allow notifications so reminders and schedule items alert you when their time arrives.</p><button class="primary" id="enableNotif">Enable notifications</button> <button class="secondary" id="testNotif">Send test</button></div><div class="card"><h3>Data & prototype</h3><p class="muted">Each account has its own data in browser local storage. This prototype can later be connected to Firebase, Supabase, or another backend for real multi-device accounts and actual push notifications.</p><button class="secondary" id="seedDemo">Restore demo data</button></div></div>`}
 
 function modal(title,body,onSave){
   const wrap=document.createElement("div");wrap.className="modal";wrap.innerHTML=`<div class="modal-card"><div class="modal-head"><h3>${title}</h3><button class="close">×</button></div>${body}<div class="actions" style="justify-content:flex-end;margin-top:18px"><button class="secondary close">Cancel</button><button class="primary" id="modalSave">Save</button></div></div>`;
@@ -151,26 +151,53 @@ function bindView(section){
   $$("[data-del-note]").forEach(b=>b.onclick=()=>{state.notes=state.notes.filter(x=>x.id!==b.dataset.delNote);saveState();render("notes")});
   $$("[data-del-schedule]").forEach(b=>b.onclick=()=>{state.schedule=state.schedule.filter(x=>x.id!==b.dataset.delSchedule);saveState();render("schedule")});
   if($("#addTask"))$("#addTask").onclick=()=>modal("Add task",`<label>Task</label><input id="mTitle" placeholder="e.g. Finish assignment"><label>Category</label><input id="mCat" value="Personal">`,w=>{let title=w.querySelector("#mTitle").value.trim();if(!title)return false;state.tasks.push({id:uid(),title,category:w.querySelector("#mCat").value.trim()||"General",done:false});saveState();render("tasks");return true});
-  if($("#addReminder"))$("#addReminder").onclick=()=>modal("Add reminder",`<label>Reminder</label><input id="mTitle" placeholder="What should I remember?"><label>Date & time</label><input id="mWhen" type="datetime-local">`,w=>{let title=w.querySelector("#mTitle").value.trim();if(!title)return false;state.reminders.push({id:uid(),title,when:w.querySelector("#mWhen").value||new Date().toISOString()});addNotif("Reminder added: "+title);saveState();render("reminders");return true});
+  if($("#addReminder"))$("#addReminder").onclick=()=>modal("Add reminder",`<label>Reminder</label><input id="mTitle" placeholder="What should I remember?"><label>Date & time</label><input id="mWhen" type="datetime-local">`,w=>{let title=w.querySelector("#mTitle").value.trim();if(!title)return false;askNotifPermission();state.reminders.push({id:uid(),title,when:w.querySelector("#mWhen").value||new Date().toISOString()});addNotif("Reminder added: "+title);saveState();render("reminders");return true});
   if($("#addTxn"))$("#addTxn").onclick=()=>modal("Add transaction",`<div class="form-grid"><div><label>Description</label><input id="mDesc" placeholder="Salary / Food / Travel"></div><div><label>Amount</label><input id="mAmt" type="number" min="0" placeholder="0"></div><div><label>Type</label><select id="mType"><option value="expense">Expense</option><option value="income">Income</option></select></div><div><label>Category</label><input id="mCat" value="General"></div></div>`,w=>{let d=w.querySelector("#mDesc").value.trim(),a=Number(w.querySelector("#mAmt").value);if(!d||!a)return false;state.transactions.push({id:uid(),desc:d,amount:a,type:w.querySelector("#mType").value,category:w.querySelector("#mCat").value,date:new Date().toISOString()});saveState();render("finance");return true});
   if($("#setWaterGoal"))$("#setWaterGoal").onclick=()=>modal("Water goal",`<label>Daily goal (ml)</label><input id="mGoal" type="number" value="${state.waterGoal}" min="500" step="100">`,w=>{let g=Number(w.querySelector("#mGoal").value);if(!g)return false;state.waterGoal=g;saveState();render("water");return true});
   if($("#sleepEdit"))$("#sleepEdit").onclick=()=>modal("Sleep",`<label>Hours slept</label><input id="mSleep" type="number" step=".5" min="0" max="24" value="${state.sleep}">`,w=>{state.sleep=Number(w.querySelector("#mSleep").value);saveState();render("wellness");return true});
   if($("#addMeal"))$("#addMeal").onclick=()=>modal("Add meal",`<label>Meal</label><input id="mName" placeholder="Breakfast"><label>Type</label><select id="mType"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select>`,w=>{state.meals.push({id:uid(),name:w.querySelector("#mName").value||"Meal",type:w.querySelector("#mType").value});saveState();render("wellness");return true});
   if($("#addExercise"))$("#addExercise").onclick=()=>modal("Add exercise",`<label>Exercise</label><input id="mName" placeholder="Walking"><label>Minutes</label><input id="mMin" type="number" value="30">`,w=>{state.exercises.push({id:uid(),name:w.querySelector("#mName").value||"Exercise",minutes:Number(w.querySelector("#mMin").value)||0});saveState();render("wellness");return true});
   if($("#addNote"))$("#addNote").onclick=()=>modal("New note",`<label>Title</label><input id="mTitle" placeholder="Note title"><label>Note</label><textarea id="mBody" rows="7" placeholder="Write your thoughts..."></textarea>`,w=>{let title=w.querySelector("#mTitle").value.trim(),body=w.querySelector("#mBody").value.trim();if(!title||!body)return false;state.notes.unshift({id:uid(),title,body,date:new Date().toISOString()});saveState();render("notes");return true});
-  if($("#addSchedule"))$("#addSchedule").onclick=()=>modal("Schedule item",`<label>Time</label><input id="mTime" type="time"><label>Title</label><input id="mTitle" placeholder="Class / work / football"><label>Details</label><input id="mDetail" placeholder="Optional">`,w=>{let title=w.querySelector("#mTitle").value.trim();if(!title)return false;state.schedule.push({id:uid(),time:w.querySelector("#mTime").value||"09:00",title,detail:w.querySelector("#mDetail").value});saveState();render("schedule");return true});
+  if($("#addSchedule"))$("#addSchedule").onclick=()=>modal("Schedule item",`<label>Time</label><input id="mTime" type="time"><label>Title</label><input id="mTitle" placeholder="Class / work / football"><label>Details</label><input id="mDetail" placeholder="Optional">`,w=>{let title=w.querySelector("#mTitle").value.trim();if(!title)return false;askNotifPermission();state.schedule.push({id:uid(),time:w.querySelector("#mTime").value||"09:00",title,detail:w.querySelector("#mDetail").value});saveState();render("schedule");return true});
   if($("#readAll"))$("#readAll").onclick=()=>{state.notifications.forEach(n=>n.read=true);saveState();render("notifications")};
   if($("#saveProfile"))$("#saveProfile").onclick=()=>{currentUser.name=$("#setName").value.trim()||"User";const u=users();u[currentUser.email].name=currentUser.name;u[currentUser.email].state=state;saveUsers(u);saveState();$("#profileName").textContent=currentUser.name;$("#avatar").textContent=currentUser.name[0].toUpperCase();toast("Profile saved")};
+  if($("#enableNotif"))$("#enableNotif").onclick=async()=>{const p=await askNotifPermission();toast(p==="granted"?"Notifications enabled ✅":p==="denied"?"Blocked — enable in browser/iPhone Settings":"Not supported here");render("settings")};
+  if($("#testNotif"))$("#testNotif").onclick=async()=>{await askNotifPermission();systemNotify("🔔 LifeFlow test","Notifications are working!")};
   if($("#seedDemo"))$("#seedDemo").onclick=()=>{state=blankState();saveState();toast("Demo data restored");render("dashboard")};
 }
 function addNotif(text){state.notifications.unshift({id:uid(),text,read:false,time:new Date().toISOString()});}
-function checkReminders(){
-  const now=Date.now();
-  state.reminders.forEach(r=>{if(!r.fired && new Date(r.when).getTime()<=now){r.fired=true;addNotif("Reminder: "+r.title);toast("Reminder: "+r.title);}});
-  saveState();
+function notifStatus(){return !("Notification" in window)?"unsupported":Notification.permission}
+async function askNotifPermission(){
+  if(!("Notification" in window)){toast("This browser doesn't support notifications");return "unsupported"}
+  if(Notification.permission==="default"){try{await Notification.requestPermission()}catch(e){}}
+  return Notification.permission;
 }
+async function systemNotify(title,body){
+  try{if(navigator.vibrate)navigator.vibrate([200,100,200])}catch(e){}
+  try{const a=new (window.AudioContext||window.webkitAudioContext)();const o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.frequency.value=880;g.gain.value=.15;o.start();o.stop(a.currentTime+.35)}catch(e){}
+  if(notifStatus()!=="granted")return;
+  const opts={body,icon:"icon.svg",badge:"icon.svg",tag:"lf-"+Date.now(),requireInteraction:true,vibrate:[200,100,200]};
+  try{
+    const reg=("serviceWorker" in navigator)?await navigator.serviceWorker.getRegistration():null;
+    if(reg&&reg.showNotification)await reg.showNotification(title,opts);else new Notification(title,opts);
+  }catch(e){try{new Notification(title,opts)}catch(_){}}
+}
+function checkReminders(){
+  if(!state)return;
+  const now=Date.now();let changed=false;
+  state.reminders.forEach(r=>{if(!r.fired && new Date(r.when).getTime()<=now){r.fired=true;changed=true;addNotif("Reminder: "+r.title);toast("Reminder: "+r.title);systemNotify("⏰ LifeFlow reminder",r.title)}});
+  // daily schedule items: notify when today's time arrives
+  const d=new Date(),today=d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(),mins=d.getHours()*60+d.getMinutes();
+  state.schedule.forEach(s=>{const[h,m]=(s.time||"").split(":").map(Number);if(isNaN(h))return;if(s.lastFired!==today&&mins>=h*60+m&&mins<h*60+m+5){s.lastFired=today;changed=true;addNotif("Now: "+s.title);toast("Now: "+s.title);systemNotify("📅 "+s.title,s.detail||("Scheduled for "+s.time))}});
+  if(changed){saveState();if(typeof render==="function"&&document.querySelector("#notifDot"))$("#notifDot").style.display="block"}
+}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkReminders()});
 (function init(){
   const email=localStorage.getItem(KEY_SESSION),u=users();
-  if(email&&u[email]){currentUser=u[email];state=currentUser.state||blankState();enterApp();checkReminders();setInterval(checkReminders,30000)}
+  if(email&&u[email]){currentUser=u[email];state=currentUser.state||blankState();enterApp();checkReminders();setInterval(checkReminders,10000)}
   else showAuth("login");
 })();
+
+if("serviceWorker" in navigator && location.protocol !== "file:"){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}

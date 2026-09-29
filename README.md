@@ -1,25 +1,15 @@
-# LifeFlow Prototype
+# LifeFlow iOS Prototype
 
-A browser-based prototype implementing the LifeFlow requirements shown in the reference image.
+Optimized for iPhone/iPad with safe-area support, touch controls, mobile bottom navigation, responsive layouts, PWA manifest, offline caching, and Apple Home Screen metadata.
 
-## Included features
-- Sign up / Login
-- Separate local data for each account
-- Personal dashboard
-- My Tasks with completion tracking
-- Reminders with time-based prototype notifications
-- Progress tracking
-- Income / Expenses / Savings
-- Spending analysis table
-- Water tracking and configurable goal
-- Sleep / Meals / Exercise tracking
-- Personal Notes
-- Daily Schedule
-- Notifications center
-- Profile settings
-- Responsive desktop/mobile layout
+## Install on iPhone
+Host these files on an HTTPS website, open the site in Safari, tap Share → Add to Home Screen, then open LifeFlow from the Home Screen.
 
-## Run
-Open `index.html` in a modern browser.
+Directly opening index.html works for basic testing, but PWA installation/offline service workers require HTTPS.
 
-This is a frontend prototype. Data is stored with browser localStorage. For a production application, connect authentication, database storage, and push notifications to a backend such as Firebase/Supabase.
+For a production iOS app, connect the frontend to a secure backend and optionally wrap it with Capacitor/Xcode to create an App Store IPA.
+
+## Notifications
+Open Settings → Enable notifications. Reminders and daily schedule items then show a system notification, sound and vibration when their time arrives.
+- iPhone: requires iOS 16.4+ and the app added to the Home Screen.
+- Web pages can only fire these while the app/tab is open or running in the background. For alerts when the app is fully closed, a backend with Web Push is needed.
