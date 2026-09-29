@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LifeFlow — Personal Life Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="toast" class="toast"></div>
+
+  <section id="authView" class="auth-shell">
+    <div class="auth-card">
+      <div class="brand-mark">LF</div>
+      <h1>LifeFlow</h1>
+      <p class="muted">Your personal life, organized in one flow.</p>
+
+      <div class="auth-tabs">
+        <button class="tab active" data-auth="login">Login</button>
+        <button class="tab" data-auth="signup">Sign up</button>
+      </div>
+
+      <form id="authForm">
+        <label>Name</label>
+        <input id="authName" placeholder="Your name" autocomplete="name" />
+        <label>Email</label>
+        <input id="authEmail" type="email" placeholder="you@example.com" required />
+        <label>Password</label>
+        <input id="authPassword" type="password" placeholder="••••••••" required minlength="4" />
+        <button class="primary full" type="submit" id="authSubmit">Login</button>
+      </form>
+      <p class="tiny">Prototype mode: accounts and data are stored locally in this browser.</p>
+    </div>
+  </section>
+
+  <section id="appView" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="side-brand"><span>LF</span><strong>LifeFlow</strong></div>
+      <nav id="nav">
+        <button class="nav-item active" data-section="dashboard">🏠 <span>Dashboard</span></button>
+        <button class="nav-item" data-section="tasks">✅ <span>My Tasks</span></button>
+        <button class="nav-item" data-section="reminders">⏰ <span>Reminders</span></button>
+        <button class="nav-item" data-section="progress">📊 <span>Progress</span></button>
+        <button class="nav-item" data-section="finance">💰 <span>Money</span></button>
+        <button class="nav-item" data-section="water">💧 <span>Water</span></button>
+        <button class="nav-item" data-section="wellness">😴 <span>Wellness</span></button>
+        <button class="nav-item" data-section="notes">📝 <span>Notes</span></button>
+        <button class="nav-item" data-section="schedule">🗓️ <span>Schedule</span></button>
+        <button class="nav-item" data-section="notifications">🔔 <span>Notifications</span></button>
+      </nav>
+      <div class="side-bottom">
+        <button class="nav-item" data-section="settings">⚙️ <span>Settings</span></button>
+        <button id="logoutBtn" class="logout">↪ Logout</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">PERSONAL DASHBOARD</div>
+          <h2 id="pageTitle">Good evening</h2>
+        </div>
+        <div class="top-actions">
+          <button class="icon-btn" data-section="notifications" title="Notifications">🔔<span id="notifDot"></span></button>
+          <div class="profile">
+            <div class="avatar" id="avatar">U</div>
+            <div><strong id="profileName">User</strong><small id="profileEmail">email</small></div>
+          </div>
+        </div>
+      </header>
+
+      <div id="content" class="content"></div>
+    </main>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
